@@ -15,42 +15,48 @@ patches-own [
 to setup [seed-one?]
   clear-all
   set color-mode 0
-  ask patches
-    [ set first-heard -1
-      set times-heard 0
-      recolor ]
-  ifelse seed-one?
-    [ seed-one ]
-    [ seed-random ]
+  ask patches [
+    set first-heard -1
+    set times-heard 0
+    recolor
+  ]
+  ifelse seed-one? [
+    seed-one
+  ] [
+    seed-random
+  ]
   reset-ticks
 end
 
 to seed-one
   ;; tell the center patch the rumor
-  ask patch 0 0
-    [ hear-rumor ]
+  ask patch 0 0 [
+    hear-rumor
+  ]
 end
 
 to seed-random
   ;; seed with random number of rumor sources governed by init-clique slider
-  ask patches with [times-heard = 0]
-    [ if (random-float 100.0) < init-clique
-        [ hear-rumor ] ]
+  ask patches with [times-heard = 0] [
+    if (random-float 100.0) < init-clique [
+      hear-rumor
+    ]
+  ]
 end
 
 to go
-  if all? patches [times-heard > 0]
-    [ stop ]
-  ask patches with [ times-heard > 0 ]
-    [ spread-rumor ]
+  if all? patches [times-heard > 0] [ stop ]
+  ask patches with [ times-heard > 0 ] [ spread-rumor ]
   tick
 end
 
 to spread-rumor  ;; patch procedure
   let neighbor nobody
-  ifelse eight-mode?
-    [ set neighbor one-of neighbors ]
-    [ set neighbor one-of neighbors4 ]
+  ifelse eight-mode? [
+    set neighbor one-of neighbors
+  ] [
+    set neighbor one-of neighbors4
+  ]
   ;; Wetick
   ask neighbor [ hear-rumor ]
 end
@@ -60,10 +66,13 @@ to hear-rumor  ;; patch procedure
   ;; the only way to know if RESET-TICKS hasn't been called yet is to try to get the TICKS
   ;; and catch the ensuing error. On normal ticks, we use TICKS + 1 because that's going
   ;; to be the tick on which this patch will be included in statistics.
-  if not heard-rumor?
-    [ carefully
-        [ set first-heard ticks + 1 ]
-        [ set first-heard 0 ] ]
+  if not heard-rumor? [
+    carefully [
+      set first-heard ticks + 1
+    ] [
+      set first-heard 0
+    ]
+  ]
   set times-heard times-heard + 1
   recolor
 end
@@ -71,23 +80,31 @@ end
 ;;; coloring procedures
 
 to recolor  ;; patch procedure
-  ifelse color-mode = 0
-    [ recolor-normal ]
-    [ ifelse color-mode = 1
-      [ recolor-by-when-heard ]
-      [ recolor-by-times-heard ] ]
+  ifelse color-mode = 0 [
+    recolor-normal
+  ] [
+    ifelse color-mode = 1 [
+      recolor-by-when-heard
+    ] [
+      recolor-by-times-heard
+    ]
+  ]
 end
 
 to recolor-normal  ;; patch procedure
-  ifelse heard-rumor?
-    [ set pcolor red ]
-    [ set pcolor blue ]
+  ifelse heard-rumor? [
+    set pcolor red
+  ] [
+    set pcolor blue
+  ]
 end
 
 to recolor-by-when-heard  ;; patch procedure
-  ifelse heard-rumor?
-    [ set pcolor scale-color yellow first-heard world-width 0 ]
-    [ set pcolor black ]
+  ifelse heard-rumor? [
+    set pcolor scale-color yellow first-heard world-width 0
+  ] [
+    set pcolor black
+  ]
 end
 
 to recolor-by-times-heard   ;; patch procedure
@@ -97,10 +114,12 @@ end
 ;;; mouse handling
 
 to spread-rumor-with-mouse
-  if mouse-down?
-    [ ask patch mouse-xcor mouse-ycor
-        [ hear-rumor ]
-      display ]
+  if mouse-down? [
+    ask patch mouse-xcor mouse-ycor [
+      hear-rumor
+    ]
+    display
+  ]
 end
 
 to-report heard-rumor?
